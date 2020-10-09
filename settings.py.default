@@ -1,0 +1,114 @@
+TOKEN = ''
+GROUP_ID = 0
+
+COMMANDS = ['/ticket', '/help']
+
+INTENTS = [
+    {
+        'name': 'Помощь',
+        'tokens': ('здравствуйте', 'привет', 'как дела', '/help'),
+        'scenario': None,
+        'answer': 'Здравствуйте. Я помогу вам с заказом авиабилета. Чтобы приступить, напечатайте "/ticket"'
+    },
+    {
+        'name': 'Бронь билета',
+        'tokens': ('/ticket',),
+        'scenario': 'ticket',
+        'answer': None
+    }
+]
+
+SCENARIOS = {
+    'ticket': {
+        'first_step': 'step1',
+        'steps': {
+            'step1': {
+                'text': 'Введите город отправления',
+                'failure_text': 'Я вас не понимаю, возможно название города написано с ошибкой. В ближайшее время '
+                                'есть рейсы из этих городов: {city_from}',
+                'handler': 'handle_city_from',
+                'next_step': 'step2'
+            },
+            'step2': {
+                'text': 'Введите город назначения',
+                'failure_text': 'Я вас не понимаю, возможно название города написано с ошибкой. В ближайшее время '
+                                'есть рейсы в эти города: {city_to}',
+                'stop_scenario': 'К сожалению, рейсов в этот город нет',
+                'handler': 'handle_city_to',
+                'next_step': 'step3'
+            },
+            'step3': {
+                'text': 'Введите желаемую дату в формате "дд-мм-гггг"',
+                'failure_text': 'Я вас не понимаю, возможно это прошедшая дата, или она написана с ошибкой. '
+                                'Введите желаемую дату в формате "дд-мм-гггг"',
+                'handler': 'handle_date',
+                'next_step': 'step4'
+            },
+            'step4': {
+                'text': 'Я нашел для вас ближайшие рейсы:\n{flight_text}\nВведите номер желаемого рейса',
+                'failure_text': 'Я вас не понимаю. Пожалуйста введите номер желаемого рейса',
+                'handler': 'handle_flight',
+                'next_step': 'step5'
+            },
+            'step5': {
+                'text': 'Выберите количество желаемых мест от 1 до 5',
+                'failure_text': 'Я вас не понимаю. Пожалуйста введите число от 1 до 5',
+                'handler': 'handle_seats',
+                'next_step': 'step6'
+            },
+            'step6': {
+                'text': 'Если желаете, оставьте комментарий к вашему заказу',
+                'failure_text': None,
+                'handler': 'handle_comment',
+                'next_step': 'step7'
+            },
+            'step7': {
+                'text': 'Введите ваши фамилию и имя',
+                'failure_text': 'Допустимы только буквы.',
+                'handler': 'handle_name',
+                'next_step': 'step8'
+            },
+            'step8': {
+                'text': 'Давайте уточним ваш заказ\n'
+                        'Имя: {name}\n'
+                        'Город отправления: {city_from}\n'
+                        'Город назначения: {city_to}\n'
+                        'Рейс: {flight}\n'
+                        'Количество мест: {seats}\n'
+                        'Дополнительная информация: {comment}\n'
+                        'Все правильно? Введите "да" или "нет"',
+                'failure_text': 'Я вас не понимаю. Пожалуйста введите "да" или "нет"',
+                'stop_scenario': 'Вы можете пройти процедуру заказа билета еще раз. Для этого введите "/ticket"',
+                'handler': 'handle_confirm',
+                'next_step': 'step9'
+            },
+            'step9': {
+                'text': 'Введите ваш email, на него мы пришлем вам копию билета',
+                'failure_text': 'Я вас не понимаю. Возможно вы написали email неверно.',
+                'handler': 'handle_email',
+                'next_step': 'step10'
+            },
+            'step10': {
+                'text': 'Введите, пожалуйста, свой телефон, по нему мы свяжемся с вами для оформления заказа.',
+                'failure_text': 'Я вас не понимаю. Пожалуйста, введите свой телефон',
+                'handler': 'handle_phone',
+                'next_step': 'step11'
+            },
+            'step11': {
+                'text': 'Спасибо за регистрацию! Ваш билет ниже. В ближайшее время мы свяжемся с вами по телефону {phone}.',
+                'image': 'generate_ticket_handler',
+                'failure_text': None,
+                'handler': None,
+                'next_step': None
+            }
+        }
+    }
+}
+
+DEFAULT_ANSWER = 'Я вас не понимаю. Но я могу помочь вам с заказом авиабилета. Чтобы приступить, напечатайте "/ticket"'
+
+DB_CONFIG = dict(provider='postgres',
+                 user='postgres',
+                 password='',
+                 host='localhost',
+                 database='vk_chat_bot')
